@@ -1,11 +1,11 @@
-test:
-  username: test
-  name: TestName
-  location: TestCity, Tennessee
+DATAmadness:
+  username: DATAmadness
+  name: DATAmadness
+  location: Vancouver, Canada
   url_full: False
   url: False
   bio: An American pastor, activist, humanitarian. People know me for leading the African-American Civil Rights movement using nonviolent civil disobedience.
-  picture: assets/images/martin.jpg
+  picture: assets/images/DM_favicon.png
   facebook: False
   twitter: False
   cover: False 

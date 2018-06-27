@@ -10,7 +10,7 @@ baseurl: /
 # Website info
 title: DATAmadness
 description: Exploring the world through data analysis and machine learning
-cover: assets/images/blog-cover.jpg
+cover: assets/images/blog-cover.png
 logo: assets/images/blog-icon.png
 logo_dark: assets/images/favicon.png
 favicon: assets/images/favicon.png
