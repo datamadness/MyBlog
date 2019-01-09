@@ -3,7 +3,7 @@ layout: post
 current: post
 cover:  assets/images/tags.jpg
 navigation: True
-title: Support Data Generator in Python
+title: DRAFT Support Data Generator in Python
 date: 2018-05-27 08:00:00
 tags: [Statistics]
 class: post-template
