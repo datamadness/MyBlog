@@ -22,7 +22,7 @@ If this issue plagues you on regular basis, head to [this repository on my GitHu
 This code will allow you to input few numeric parameters and quickly generate custom support ticket datasets that reflect what you could expect in real world business operations.
 #### Feature Overview
 
-* A python function to generate one year worth of support data(call repeatedly for x years worth of data)
+* A python function to generate one year worth of support data with arbitrary amount of records(call repeatedly for x years worth of data)
 * Generates varied, but statistically relevant number of support tickets for each day of the year
 * Effects of business days vs weekends
 * Capable to simulate an impact of arbitrary number of busy seasons through the year(e.g. Christmas in retail or tax periods in accounting)
@@ -58,14 +58,14 @@ To model this behavior, the code is using truncated normal continuous variable f
         #Generate number of tickets for given day
         ticket_num = int(dist.rvs())
 </code></pre>
-Simply specify the approximate minimum and maximum number of cases per day through the year. The mean `mu` and variance `sigma` for given day then will be calculated based the seasonal effect function:
+Simply specify the approximate minimum and maximum number of cases per day through the year. The mean `mu` and variance `sigma` for given day then will be automatically calculated based the seasonal effect function:
 <pre><code class="nohighlight">        #Calculate mean for given day
         mu = (annual_maximum - annual_minimum)/2 + seasonal_factor * (busy_level - 0.5) * ((annual_maximum - annual_minimum)/2) 
         #Calculate standard deviation for given day
         sigma = (annual_maximum - annual_minimum) * 0.1
 </code></pre>
 The seasonal effect requires you to input the peak months as integer values. Here is an example for simulating two seasonal peaks in February and November:
-busy_months = np.array([2,11])
+'busy_months = np.array([2,11])'
 
 Moreover, input `seasonal_factor` (float <0,1>) allows you to control the magnitude of seasonal effects:
 
@@ -79,11 +79,6 @@ The following plot demonstrates the annual volumes and seasonality dependency wi
 </code></pre>
 *Seasonal factor impact comparison:*
 ![image test](/assets/images/support_data_generator/weekly_ticket_totals_comparison.png)
-
-
-
-
-
 
 
 ###### Impacts of weekends:
