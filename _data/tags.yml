@@ -1,4 +1,9 @@
-getting-started:
+statistics:
+  name: Statistics
+  description: False
+  cover: False
+  
+python:
   name: Statistics
   description: False
   cover: False
