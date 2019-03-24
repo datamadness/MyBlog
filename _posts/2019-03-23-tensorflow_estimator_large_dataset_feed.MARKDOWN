@@ -26,7 +26,7 @@ You can get the full python example from [my GitHub repo](https://github.com/dat
 1. Serialize the data into list(s)
 1. Save the data on drive in TFRecord format
 1. Create Estimator API input function that builds dataset from TFRecords using an iterator
-1. Train Convolutional Neural Network streaming the data via the custom input function
+1. Train Convolutional Neural Network streaming the data via a custom input function
 
 
 #### Saving Data in TFRecord format
@@ -38,7 +38,7 @@ To save this data into TFRecord format, couple of things needs to happen:
 - The data must be represented in dictionary format
 - Individual dictionary values should be flattened into scalars or 1D arrays suitable for storing as series
 
-The following function tranforms a single 28x28 MNIST digit into the desired format. Notice that the dictionary can have arbitrary number of keys which is useful for storing any metadata such as original data dimension or training labels:
+The following function tranforms a single 28x28 MNIST digit into the desired format. Notice that the dictionary can have an arbitrary number of keys which is useful for storing any metadata such as original data dimension or training labels:
 ```python
 def get_observation(observation_id=0):
     img_data = train_data[observation_id,:,:]
@@ -53,7 +53,7 @@ def get_observation(observation_id=0):
     return observation_data
 ```
 
-The next step in generating the TFRecords is to transform the dictionary into an object where all values from the dictionary are saved into one of the three TensorFLow datatype lists:
+The next step in generating the TFRecords is to transform the dictionary into an object where all values from the dictionary are saved into one of the three TensorFlow datatype lists:
 
 - Int64List
 - FloatList
@@ -100,7 +100,7 @@ for file_id in range(numFiles):
 
 #### Builing an input function for Estimators API usign TensorFlow Data API
 Once we have the data saved into TFRecords on a drive, the next step is to write an input fucntion for the Estimators API that will stream the data into your model. 
-The easiest way to accomplish this is via the Data API, specifically the TFRecordDataset class that will directly create a dataset from list of TFRecord files.
+The easiest way to accomplish this is via the Data API, specifically the TFRecordDataset class that will directly create a dataset from list of TFRecord files. The Estimators and Data APIs are designed to work together, so you do not even have to initialize the iterator for your dataset.
 The only trick to this is that you have to write a parser that will transform the serialized data in lists back into format suitable for your model. As such this is also a perfect place to build your pipeline for further data preprocessing, transformation and feature engineering.
 
 Here is the input function for our MNIST dataset:
@@ -134,7 +134,7 @@ def dataset_input_fn(subfolder, batch_size, train = False, num_epochs=None):
     
     #Shuffle data if in training mode
     if train:
-        dataset = dataset.shuffle(buffer_size=batch_size*2)  #Shuffles along first dimension(rows)(!)  and selects from buffer
+        dataset = dataset.shuffle(buffer_size=batch_size*2)
     dataset = dataset.batch(batch_size)
     dataset = dataset.repeat(num_epochs)
     
@@ -144,7 +144,7 @@ def dataset_input_fn(subfolder, batch_size, train = False, num_epochs=None):
     return dataset
 ```
 
-#### Plugging it all together: Training CNN on stream from TFR files
+#### Plugging it all together: Training your CNN on a data stream from TFR files
 
 Now when we have all the bits ready, we can put it all together and train our MNIST CNN on a data streaming from TFRecord files saved on your drive. Here is the complete modified [MNIST CNN example from TensorFlow page](https://www.tensorflow.org/tutorials/estimators/cnn):
 
@@ -239,7 +239,8 @@ logging_hook = tf.train.LoggingTensorHook(
 
 def dataset_input_fn(subfolder, batch_size, train = False, num_epochs=None):
          
-    filenames = [file for file in os.listdir(os.path.join(os.getcwd(), subfolder)) if file.endswith('.tfrecord')]
+    filenames = [file for file in os.listdir(os.path.join(os.getcwd(), 
+		subfolder)) if file.endswith('.tfrecord')]
     filenames = [os.path.join(subfolder, file) for file in filenames]
     dataset = tf.data.TFRecordDataset(filenames)
 
@@ -265,7 +266,7 @@ def dataset_input_fn(subfolder, batch_size, train = False, num_epochs=None):
     
     #Shuffle data if in training mode
     if train:
-        dataset = dataset.shuffle(buffer_size=batch_size*2)  #Shuffles along first dimension(rows)(!)  and selects from buffer
+        dataset = dataset.shuffle(buffer_size=batch_size*2)
     dataset = dataset.batch(batch_size)
     dataset = dataset.repeat(num_epochs)
     
@@ -289,7 +290,8 @@ mnist_classifier.train(
     hooks=[logging_hook])
 #%% Evaluate the model
 eval_results = mnist_classifier.evaluate(
-        input_fn=lambda : dataset_input_fn(eval_folder, train = False, batch_size = batch_size, num_epochs=1))
+        input_fn=lambda : dataset_input_fn(eval_folder, train = False, batch_size = batch_size,
+			num_epochs=1))
         #input_fn=dataset_eval_input_fn)
 print(eval_results)
 
