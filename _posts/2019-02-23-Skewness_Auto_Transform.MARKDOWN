@@ -12,17 +12,18 @@ author: DATAmadness
 mathjax: true
 ---
 
-When I stumble on a cool new dataset, I often find myself excitedly prototyping a quick machine learning models to see what I can get out of the latest find. This is mostly easy thanks to plenty awesome packages such as scikit-learn or Keras. As a result, I spend most of my prototyping effort on cleaning and transforming the data.
+When I stumble on an interesting new dataset, I often find myself excitedly prototyping a quick machine learning models to see what type of insights I could get out of the latest find. Since hacking together a quick model can be fast thanks to plenty awesome packages such as scikit-learn or Keras, I happen to spend most of my prototyping effort on cleaning and transforming the data. (I always like to start with the simplest regressors / classifiers)
 
-To speed up the initial transformation, I wrote a small python function that takes a Pandas DataFrame and automatically transforms any columns that exceed specified skewness. You can get it from [my GitHub repo](https://github.com/datamadness/Automatic-skewness-transformation-for-Pandas-DataFrame). Specifically these two python files:
+To help speeding up the initial transformation pipe, I wrote a small general python function that takes a Pandas DataFrame and automatically transforms any columns that exceed specified skewness. You can get it from [my GitHub repo](https://github.com/datamadness/Automatic-skewness-transformation-for-Pandas-DataFrame). Specifically, you'll find these two python files:
 
 `skew_autotransform.py`<br>
 `TEST_skew_autotransform.py`
 
 The first file lets you import the *skew_autotransform()* function and use it in your project:
-<pre><code class="nohighlight">from skew_autotransform import skew_autotransform
+```python
+from skew_autotransform import skew_autotransform
 skew_autotransform(DF, include = None, exclude = None, plot = False, threshold = 1, exp = False)
-</code></pre>
+```
 
 #### Feature Overview
 
@@ -30,24 +31,25 @@ skew_autotransform(DF, include = None, exclude = None, plot = False, threshold =
 * Allows to specify list of columns that should be processed or excluded
 * Selection between Box-Cox transformation or log / exponential transformation
 * Recognizes positive / negative skewness and applies appropriate transform (log / exp)
-* Plots before and after comparison
+* Handles negative values
+* Plots before and after comparison of the data
 
 #### Input parameters summary
-* **DF**: Pandas DataFrame, mandatory
-* **threshold**: skewness threshold, default value = 1, optional
-* **include**: list of columns to process, optional
-* **exclude**: list of columns to exclude, optional
-* **exp**: If true, applies log / exponential transformation, default value is False that applies Box-Cox transformation, optional
+* **DF**: Pandas DataFrame, *mandatory*
+* **threshold**: skewness threshold, default value = 1, *optional*
+* **include**: list of columns to process, *optional*
+* **exclude**: list of columns to exclude, *optional*
+* **exp**: If true, applies log / exponential transformation, default value is False that applies Box-Cox transformation, *optional*
 
 #### Example #1
 Import Boston housing dataset and apply Box-Cox transformation on any column that has absolute value of skewness larger than 0.5:
 
-<pre><code class="nohighlight">import pandas as pd
+```python
+import pandas as pd
 import numpy as np
-from skew_autotransform import skew_autotransform
-
-#Import test dataset - Boston huosing data
 from sklearn.datasets import load_boston
+
+from skew_autotransform import skew_autotransform
 
 exampleDF = pd.DataFrame(load_boston()['data'], columns = load_boston()['feature_names'].tolist())
 
@@ -55,7 +57,7 @@ transformedDF = skew_autotransform(exampleDF.copy(deep=True), plot = True, exp =
 
 print('Original average skewness value was %2.2f' %(np.mean(abs(exampleDF.skew()))))
 print('Average skewness after transformation is %2.2f' %(np.mean(abs(transformedDF.skew()))))
-</code></pre>
+```
 
 Output:
 
@@ -129,20 +131,21 @@ Average skewness after transformation is 0.74
 #### Example #2
 Import Boston housing dataset and apply log and exponential transformation on any column that has absolute value of skewness larger than 0.7. Exclude 'B' and 'LSTAT' column from the operation:
 
-<pre><code class="nohighlight">import pandas as pd
+```python
+import pandas as pd
 import numpy as np
-from skew_autotransform import skew_autotransform
-
-#Import test dataset - Boston huosing data
 from sklearn.datasets import load_boston
+
+from skew_autotransform import skew_autotransform
 
 exampleDF = pd.DataFrame(load_boston()['data'], columns = load_boston()['feature_names'].tolist())
 
-transformedDF = skew_autotransform(exampleDF.copy(deep=True), plot = True, exp = False, threshold = 0.5)
+transformedDF = skew_autotransform(exampleDF.copy(deep=True), plot = True, 
+                                   exp = True, threshold = 0.7, exclude = ['B','LSTAT'])
 
 print('Original average skewness value was %2.2f' %(np.mean(abs(exampleDF.skew()))))
 print('Average skewness after transformation is %2.2f' %(np.mean(abs(transformedDF.skew()))))
-</code></pre>
+```
 
 Output:
 
@@ -213,7 +216,8 @@ Average skewness after transformation is 0.92
 </code></pre>
 
 
-You can see on these examples that both cases allowed me to very quickly improve the skewness of the data from 1.5 to more reasonable 0.7 and 0.9 respective. While it is not perfect, it is generally good enough for a first prototype. 
-I would also recommend to quickly check which transformation works better for your specific dataset.
+The examples demonstrate that both cases allowed me to improve the skewness of the data from 1.5 to more reasonable 0.7 and 0.9 respective using only two lines of code. While the function is not perfect, it is generally good enough for a first prototype. 
+
+Note: I would recommend to quickly check which transformation works better for your specific dataset. The Box-Cox works well in most situations, but log/exponential can return better results in some cases.
 
 Enjoy!
