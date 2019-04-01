@@ -8,7 +8,5 @@ class: page-template
 subclass: 'post page'
 ---
 
-This blog is about data, MI and data science. About description will go here.
+This blog is used for one persons thought and code snippets created while having fun with data , Machine Learning and data science. 
 
-> This is abuot text.
-Next line here.
