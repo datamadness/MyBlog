@@ -1,12 +1,10 @@
 DATAmadness:
   username: DATAmadness
   name: DATAmadness
-  location: Vancouver, Canada
+  location: Vancouver BC
   url_full: False
   url: False
-  bio: A young tech professional from the beautiful British Columbia who likes to spend his time exploring the wast amount of the data readily available through the world. My hobby, if not diving or skiing is to learn novel Machine Learning techniques and use them to discover new insights and patterns in data. This blog mostly includes snippets from my thoughs and python code that might perhaps helps someone else doing the same.
-  
-  There is always something new to learn!
+  bio: It is a capital mistake to theorize before one has data.” — Sherlock Holmes
   
   picture: assets/images/DM_favicon.png
   facebook: False

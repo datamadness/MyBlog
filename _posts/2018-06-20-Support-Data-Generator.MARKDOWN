@@ -53,17 +53,20 @@ Customer base controls:
 #### Modelling daily tickets volumes through the year
 The number of daily tickets is typically random variable that has reasonably defined mean and variance. Moreover, the mean is likely to move through the year to reflect seasonal effects such as major holidays or annual business cycles. 
 To model this behavior, the code is using truncated normal continuous variable function from scipy package to generate the number of tickets on given day:
-<pre><code class="nohighlight">        #Calculate distribution function
-        dist = stats.truncnorm((annual_minimum - mu) / sigma, (annual_maximum - mu) / sigma, loc=mu, scale=sigma)
-        #Generate number of tickets for given day
-        ticket_num = int(dist.rvs())
-</code></pre>
+```python
+#Calculate distribution function
+dist = stats.truncnorm((annual_minimum - mu) / sigma, (annual_maximum - mu) / sigma, loc=mu, scale=sigma)
+#Generate number of tickets for given day
+ticket_num = int(dist.rvs())
+```
 Simply specify the approximate minimum and maximum number of cases per day through the year. The mean `mu` and variance `sigma` for given day then will be automatically calculated based the seasonal effect function:
-<pre><code class="nohighlight">        #Calculate mean for given day
-        mu = (annual_maximum - annual_minimum)/2 + seasonal_factor * (busy_level - 0.5) * ((annual_maximum - annual_minimum)/2) 
-        #Calculate standard deviation for given day
-        sigma = (annual_maximum - annual_minimum) * 0.1
-</code></pre>
+```python
+#Calculate mean for given day
+mu = (annual_maximum - annual_minimum)/2 + seasonal_factor * (busy_level - 0.5) * 
+	((annual_maximum - annual_minimum)/2) 
+#Calculate standard deviation for given day
+sigma = (annual_maximum - annual_minimum) * 0.1
+```
 The seasonal effect requires you to input the peak months as integer values. Here is an example for simulating two seasonal peaks in February and November:
 'busy_months = np.array([2,11])'
 
@@ -73,10 +76,11 @@ Moreover, input `seasonal_factor` (float <0,1>) allows you to control the magnit
 * 1 maximum seasonal effects
 
 The following plot demonstrates the annual volumes and seasonality dependency with all other parameters being constant:
-<pre><code class="nohighlight">    annual_minimum = 5		# ~ annual daily minimum of tickets
-    annual_maximum = 50       	# ~ annual daily maximum of tickets           
-    busy_months = np.array([2,7])       # February and July are busy months
-</code></pre>
+```python
+annual_minimum = 5		# ~ annual daily minimum of tickets
+annual_maximum = 50		# ~ annual daily maximum of tickets
+busy_months = np.array([2,7])	# February and July are busy months
+```
 *Seasonal factor impact comparison:*
 ![image test](/assets/images/support_data_generator/weekly_ticket_totals_comparison.png)
 
