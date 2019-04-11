@@ -3,32 +3,104 @@ layout: post
 current: post
 cover:  assets/images/startup-desktop.jpg
 navigation: True
-title: Forecasting Operations Team Resources Using Statistics
-date: 2018-06-24 10:32:00
+title: Forecasting Operations Team Resources Allocation Using Statistics
+date: 2019-4-1 10:32:00
 tags: [Statistics]
 class: post-template
 subclass: 'post tag-Statistics'
 author: DATAmadness
+mathjax: true
 ---
-Planning staff allocation in an environment geared heavily towards operations can be challenging due to the erratic nature of the demand from the internal or external clients. The predictability issues affects wide range of teams - from sales or support teams to development teams or analytics teams. If your team is exposed to any type of ad-hoc requests on regular basis, you are likely familiar with having your carefully estimated project plans derailed by unexpected workload.
+Planning staff allocation in an environment geared heavily towards operations can be challenging due to the erratic nature of the demand from both internal or external clients. The predictability issues affect wide range of teams - from sales or support to development and data analytics departments. If your team is exposed to any type of ad-hoc requests on regular basis, you are likely familiar with having your carefully estimated project plans derailed by unexpected workload. 
 
-This article will propose a team resources planning framework that allows you to estimate:
+This article will demonstrate that it is possible to accurately predict commitments even in a very erratic environment as long as we choose the right time frame and management approach. We propose a simple, but powerful methodology for your operations team planning. As opposed to the common go-to Machine Learning solution, we'll use simple statistics that will let us to get away with a small dataset that is readily available at most businesses.
+
+> For managers, the message is that it is not always possible to micromanage the team and require meeting daily or weekly deadlines for secondary project work in operations, but it is most certainly possible to plan and hold the team responsible for delivering results on monthly basis.
+
+The proposed resource planning framework will allow you to estimate:
 
 - The fraction of team resources required to accommodate the seemingly random ad-hoc tasks without being overwhelmed
-- How much of your team's time can be safely committed to project work 
+- How much of your team's time can be safely committed to project work
 
-To tackle this task, we will use basics statistics to guide your staffing and time allocation decisions by using basic data that are typically available in your company or can be even estimated and modeled. 
 
 The data used in this example are generated using a statistical model described in [this article](https://datamadness.github.io/Support-Data-Generator). You can use the provided tool to model your own data for quick experiments.
 
-## Exploring the available data
+#### Business Scenario
+You are a manager of data analytics team with 20 team members. The team provides business intelligence, reporting and data consultation services to several departments in your large corporation X. Most requests come to the team on an ad-hoc basis and are difficult to predict. The rest of the team's time is dedicated to project work such as developing more advanced data science and ML solutions to increase efficiency.
+
+**The problem:** The team often misses project deadlines because they are busy with surge of analytics and reporting requests that must be done with high priority.
+
+#### Exploring the available data
+The team logs time they spend on providing the data analytics requests for the company. We can explore the data from past six years in this interactive visualization(you can display it fullscreen):
 <iframe width="800" height="600" src="https://app.powerbi.com/view?r=eyJrIjoiY2ZlODU5YjAtZTQxMC00MzUxLTgyNjgtOWY5MjcyZGU1ZGY1IiwidCI6ImZmZTRhZjdkLWIxODgtNDIzZi1iMmQ5LTUwZmIzYjQ2NjU2ZiJ9" frameborder="0" allowFullScreen="true"></iframe>
 
+<br>
+**Key takeaways from 2017 data:**
+
+- The effort is highly cyclical with more requests coming in around quarter ends when there is higher need for reporting
+- Most requests come from Investor Relations and Sales and Marketing departments
+- The maximum monthly effort in 2017 was logged in December with 1663 hours
+- The minimum monthly effort in 2017 was logged in January with 719 hours
+- Annual monthly median is around 1180 Hours
 
 
-### April Recorded
+#### Challenge: Accurately Predict Team Resources Allocation for Next Month
+Lets imagine it is the end of April 2018 and we want to accurately predict May 2018 numbers:
+
+1. How much time the team will spend on ad-hoc requests
+1. How much time we can safely commit to project work while using teams time efficiently
+
+To do this, we will first look at the previous months data:
 <iframe width="800" height="600" src="https://app.powerbi.com/view?r=eyJrIjoiZTE2NzVjZjgtOTRkOC00OGY5LTgyZmUtOTVlNDRlMDIwYTdjIiwidCI6ImZmZTRhZjdkLWIxODgtNDIzZi1iMmQ5LTUwZmIzYjQ2NjU2ZiJ9" frameborder="0" allowFullScreen="true"></iframe>
 
+We see that on daily basis the team spent:
+Average of 
 
-### May Predicted vs Actual
+$$ \mu_{april} = 45.5 Hours$$ 
+
+on reports with Standard Deviation 
+
+$$ \sigma_{april} = 17.5 Hours$$
+
+This allows us to calculate the Standard Deviation of the Mean (SEM) as:
+
+$$ SEM = \frac \sigma {\sqrt n} = \frac {17.5} {\sqrt 30} = 3.2 Hours $$
+
+This is where we get the first big help from statistics. While the daily logged time in April went from minimum of 17 hours a day to maximum of 84 hours a day, with 30 days in a month we the standard deviation of the mean(SEM) is only 3.2 Hours. That is very little!
+
+The second huge accuracy boost comes from the [Central Limit Theorem](https://en.wikipedia.org/wiki/Central_limit_theorem) that tells us that even our skewed data will have normally distributed mean with sample size large enough. The rule of thumb is to have 30 or more samples. Luckily for us, one month has 30 days! (You might want to increase the prediction time frame if you want to give your employees weekends off :)
+
+As a result, we can use simple normal distribution statistics to calculate the 95% Confidence Interval(CI) for April and get:
+
+$$ 1358 \le \bar x \le 1370$$
+
+We actually know for fact that the true mean is in this range, but the goal is to use this interval for extrapolation for the May 2018 Confidence Interval. As I said, we'll keep things very simple and look at year 2017 to see that May was ~8% higher than April. Hence, we simply add 8% to the April CI to predict the range for May 2018 mean as:
+
+$$ 1466 \le \bar x \le 1480$$
+
+This means that our team of 20 with total of 4000 man hours available will spend approximately:
+- **1470 hours** on ad-hoc requests for the corporation
+- **2530 hours** can be safely dedicated to other work such as projects
+
+Notice how we went from standard daily deviation of 17.5 hours to predicting the monthly effort within an interval of 14 hours!!!
+
+**Bonus: Poisson Distribution**
+
+We can also use Poisson distribution to predict the probability that we'll receive 6 or more request on any given day is 0.06 simply by knowing that in April, we received 3.4 requests a day on average. Hence, we can expect that we will most likely get 6 requests a day on one or two occasions in May.
+
+
+#### May 2018 Prediction vs Reality
+So how did we do with our predictions when compared to reality? Here is the May 2018 overview:
 <iframe width="800" height="600" src="https://app.powerbi.com/view?r=eyJrIjoiZDUwM2EyOTUtYWM2NS00YTNlLWFkNGItMmIxMzljYWJiOTJlIiwidCI6ImZmZTRhZjdkLWIxODgtNDIzZi1iMmQ5LTUwZmIzYjQ2NjU2ZiJ9" frameborder="0" allowFullScreen="true"></iframe>
+
+In quite hard-to-believe result, we were able to predict the entire months effort required for ad-hoc analytics and reporting requests with more than 99% accuracy, being off by 11 hours only(compared to the actual 1459).
+
+#### Conclusion
+
+The experiment shows that if we select the correct time frame for our planning, we can use the strength of simple statistics to predict future effort with high accuracy even for teams engaged in seemingly unpredictable business. While we would be hard pressed to predict the effort required for the next day with 20 Hour accuracy, we could predict entire months effort with 11 hour effort.
+
+For managers, the message is that it is not possible to micromanage the team and require meeting daily or weekly deadlines for secondary project work, but it is most certainly possible to plan and hold the team responsible for delivering results on monthly basis.
+
+Data, calculations and visualization files used in this example can be downloaded from [this GitHub repo](https://github.com/datamadness/Statistics-for-planning-team-reasources-in-operations).
+
+
