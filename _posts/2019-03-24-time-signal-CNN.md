@@ -1,3 +1,4 @@
+drive
 ---
 layout: post
 current: post
@@ -12,14 +13,14 @@ author: DATAmadness
 mathjax: true
 ---
 
-This example explores the possibility to use Convolutional Neural Network(CNN) to classify time domain signal. The fundamental thesis of this work is that arbitrarily long sampled time domain signal can be divided into short segments using a window function. These segments can be further converted to frequency domain data via [Short Time Fourier Transform(STFT)](https://en.wikipedia.org/wiki/Short-time_Fourier_transform)	. This approach is well known from acoustics, but it is easily applicable on any frequency spectrum.
-The goal of this work is to add an alternative tool to ensemble of classifiers for time signal predictions. As an example, this specific classifier example was developed on [VSB Power Line Fault Detection dataset](https://www.kaggle.com/c/vsb-power-line-fault-detection/data) where I aimed to combine three classifiers:
+This example explores the possibility of using a Convolutional Neural Network(CNN) to classify time domain signal. The fundamental thesis of this work is that an arbitrarily long sampled time domain signal can be divided into short segments using a window function. These segments can be further converted to frequency domain data via [Short Time Fourier Transform(STFT)](https://en.wikipedia.org/wiki/Short-time_Fourier_transform)	. This approach is well known from acoustics, but it is easily applicable on any frequency spectrum.
+The goal of this work is to add an alternative tool to an ensemble of classifiers for time signal predictions. To illustrate, this specific classifier example was developed on [VSB Power Line Fault Detection dataset](https://www.kaggle.com/c/vsb-power-line-fault-detection/data) where I aimed to combine three classifiers:
 
 - Long Short-Term Memory (LSTM) Recurent Neural Network(RNN),
 - Gradient Boosted Decision Tree using signal statistics, and finally the
 - Convolutional Neural Network(CNN)
 
-These three methods are based on very different principles and therefore, they can complement each other with different sets of strengths and weaknesses.
+These three methods are based on very different principles and can complement each other with different sets of strengths and weaknesses.
 
 #### Full example repo on GitHub
 If you want to get the files for the full example, you can get it from [this GitHub repo](https://github.com/datamadness/Time-signal-classification-using-Convolutional-Neural-Network). You'll find two files:
@@ -29,7 +30,7 @@ If you want to get the files for the full example, you can get it from [this Git
 #### Signal Processing
 
 #### The Raw Data
-The raw dataset contains time domain measurements of 3 phase transmission line. Each measurement contains three individual phase signals with 800 000 discrete data points covering 20ms (or one cycle at 50Hz). The following plot shows the data for single measurement:
+The raw dataset contains time domain measurements of a 3-phase transmission line. Each measurement contains three individual phase signals with 800 000 discrete data points covering 20ms (or one cycle at 50Hz). The following plot shows the data for a single measurement:
 
 ![image post](/assets/images/time_signal_CNN/raw_data_visualization.png)
 
@@ -40,19 +41,19 @@ Each phase can have one class:
 
 Therefore, for the purposes of this particular classifier, we take each individual phase signal as a single independent sample. As a result, in the raw form we have 800k features per sample and a binary classification problem.
 
-*Warning: We still must split the data into train/test based on measurements. Having different phases from a single measurement in both train and test dataset would most certainly lead to information leak!*
+*Warning: We still must split the data into train/test based on measurements. Having different phases from a single measurement in both train and test datasets would most certainly lead to information leak!*
 
 #### Data Transformation
-Here is a summary what we know about the raw signal data:
+Here is a summary of what we know about the raw signal data:
 
 - 1D tensor with length $800e5$
 - Measurement length of $20ms$ gives us
 - Sampling frequency $f_s=40MHz$
 - STFT can reliably resolve frequency domain features up to $20MHz$ as per [sampling theorem](https://en.wikipedia.org/wiki/Nyquist–Shannon_sampling_theorem)
 
-With this knowledge, we can use scipy stft to transform the 1D time domain data into 2D tensor of frequency domain features. That being said, the overall length of the data is still going to amount to $800e5$ datapoints.
-As an example STFT with $nperseg=2000$ will return 2D array with shape 1000x800.
-To reduce the data size, we can use block_reduce with stride of 4 and np.max function(works just like pooling in CNN).
+With this knowledge, we can use scipy stft to transform the 1D time domain data into a 2D tensor of frequency domain features. That being said, the overall length of the data is still going to amount to $800e5$ datapoints.
+As an example, STFT with $nperseg=2000$ will return 2D array with a shape of 1000x800.
+To reduce the data size, we can use block_reduce with a stride of 4 and np.max function(works just like pooling in CNN).
 
 Here is the complete function to execute this two step transformation:
 ```python
@@ -78,14 +79,14 @@ The following image plot shows the output spectrogram from a single 20ms signal:
 
 ![image post](/assets/images/time_signal_CNN/spectrogram.png)
 
-The final dimension is 250x200 points, which is considerable reduction with acceptable information loss. Additionally, the resulting 2D tensor is more favorable to CNN architectures that most of us are familiar with from image classification.
+The final dimension is 250x200 points, which is a considerable reduction with acceptable information loss. Additionally, the resulting 2D tensor is more favorable to CNN architectures that most of us are familiar with from image classification.
 
 #### Upsampling and TFrecords for Data Streaming
-Since the transformed training data still require gigabytes of memory, I save them into smaller TFRecords that will allow smooth data streaming during CNN training in TensorFlow. This is described in more detail in [this post](https://datamadness.github.io/tensorflow_estimator_large_dataset_feed).
+Since the transformed training data still requires gigabytes of memory, I save them into smaller TFRecords that will allow for smooth data streaming during CNN training in TensorFlow. This is described in more detail in [this post](https://datamadness.github.io/tensorflow_estimator_large_dataset_feed).
 
-The following code will split the measurement ids into train/test datasets while protecting phase signals from single measurement being split. 
+The following code will split the measurement ids into train/test datasets while protecting phase signals from a single measurement being split. 
 Since the classes are also highly unbalanced(about 14:1), the code will also upsample the minor class using permutation operations to avoid having duplicated samples.
-Note: Only train data are upsampled.
+Note: Only train data is upsampled.
 
 
 ```python
@@ -220,3 +221,5 @@ generate_TFR(measurement_id, measurements_per_file = 8, output_path = output_pat
 ```
 
 I will focus on using the preprocessed frequency domain data in a Convolutional Neural Network in part 2 of this mini-series.
+
+[Read Part 2](https://datamadness.github.io/time-signal-CNN-part2)

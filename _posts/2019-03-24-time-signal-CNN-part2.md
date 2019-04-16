@@ -14,7 +14,7 @@ mathjax: true
 
 After transforming 1D time domain data series into frequency 2D maps in [part 1](https://datamadness.github.io/time-signal-CNN) of this miniseries, we'll now focus on building the actual Convolutional Neural Network binary classification model. The goal is to detect whether the original time domain signal exhibits partial discharge and is likely to result in a power line failure in the future.
 
-Two CNN models of various depth and complexity are presented to discuss the hyperparameters, results and suitability for given dataset that presents challenges related to limited size and highly unbalanced classes.
+Two CNN models of various depth and complexity are presented to discuss the hyperparameters, results and suitability for a given dataset that presents challenges related to limited size and highly unbalanced classes.
 
 #### Full example repo on GitHub
 If you want to get the files for the full example, you can get it from [this GitHub repo](https://github.com/datamadness/Time-signal-classification-using-Convolutional-Neural-Network). You'll find two files:
@@ -23,19 +23,21 @@ If you want to get the files for the full example, you can get it from [this Git
 
 #### Dataset Overview
 - Individual sample format: [250 x 200 2D tensor](https://datamadness.github.io/time-signal-CNN)
-- Train: 8160 samples with upsampled minority class using custom permutations
+- Train: 8160 samples with an upsampled minority class using custom permutations
 - Evaluation: 2178 samples
 - Storage: TFRecords with 30 samples per file
 
 #### TensorFlow Approach
-The CNN models are built using TensorFlow Estimators API as it provides good flexibility and control over building custom models while allowing more robust data streaming and resource solution. This is highly desirable as we work with fairly large dataset and wish to reduce the cost related to computing resources. As a result, the input function for the custom estimators will stream the data batch by batch, which allows us to use arbitrary computing resources and the only limitation is time we are willing to dedicate to training the CNN.
-to accommodate this solution, the input function uses TensorFlow Data API and TFRecord iterator. This is extremely convenient solution ans the Estimators API will take care of initializing the iterator and setting up thee graph.
+The CNN models are built using the TensorFlow Estimators API, as it provides good flexibility and control over building custom models while allowing more robust data streaming and resource solution. This is highly desirable as we work with fairly large dataset and wish to reduce the costs related to computing resources. 
+
+As a result, the input function for the custom estimators will stream the data batch by batch, which allows us to use arbitrary computing resources and the only limitation is the time we are willing to dedicate to training the CNN.
+To accommodate this solution, the input function uses the TensorFlow Data API and TFRecord iterator. This is extremely convenient solution and the Estimators API will take care of initializing the iterator and setting up the graph.
 
 #### Input function and Pipeline
-The input_fn of estimator API serve for two purposes:
+The input_fn of the Estimator API serves two purposes:
 
 - Create a dataset to stream parsed data via an iterator
-- Establish pipeline for data transformation before feeding it to the model
+- Establish a pipeline for data transformation before feeding it to the model
 
 The input_fn receives four parameters:
 
@@ -57,7 +59,7 @@ def dataset_input_fn(subfolder, batch_size, train = False, num_epochs=None):
     dataset = tf.data.TFRecordDataset(filenames)
 ```
 
-Note that the Estimator API will take care of intializing the iterator so we do not have to worry about it here as opposed to manually building a graph where you would have to do something like this:
+Note that the Estimator API will take care of initializing the iterator, so we do not have to worry about it here as opposed to manually building a graph where you would have to do something like this:
 ```python
     iterator = dataset.make_initializable_iterator()
     sess.run(iterator.initializer)
@@ -77,7 +79,7 @@ The second step in the input_fn is to parse the data from TFRecords, where the d
 
 **Pipeline**
 
-The parsing and input_fn is an ideal place for building your pipeline. In this example, the pipeline consists of two operations. First, we can assume that any physical effects related to the partial discharge are exhibiting at higher frequencies. This is due to the fact that partial discharge lasts only very short time(order of microseconds). Therefore, we can easily reduce the feature size by dropping all datapoints representing lower frequencies without loosing any valuable information:
+The parsing and input_fn is an ideal place for building your pipeline. In this example, the pipeline consists of two operations. First, we can assume that any physical effects related to the partial discharge are exhibiting at higher frequencies. This is due to the fact that a partial discharge lasts only a very short time(in the order of microseconds). Therefore, we can easily reduce the feature size by dropping all datapoints representing lower frequencies without losing any valuable information:
 ```python
         signal_data = tf.reshape(parsed['signal'], [-1, 250, 200])
         #remove low frequency components
@@ -85,10 +87,10 @@ The parsing and input_fn is an ideal place for building your pipeline. In this e
 ```
 We could possibly experiment with removing even more of the low frequency datapoints and reducing the feature tensor dimension.
 
-The second step in the normalization is to scale the data. The following code demonstrates to types of scaling:
+The second step in the normalization is to scale the data. The following code demonstrates two types of scaling:
 
-- Min/Max with rounding to 0 or 1, creating black and white feature map
-- Scaling to a fixed value, creating float map where most values lie between 0 and 1, but outliers can reach higher values without reducing most of the information.
+- Min/Max with rounding to 0 or 1, creating a black and white feature map
+- Scaling to a fixed value, creating a float map where most values lie between 0 and 1, but outliers can reach higher values without reducing most of the information.
 
 ```python
         # Perform additional preprocessing on the parsed data.
@@ -139,11 +141,11 @@ with tf.Session() as sess:
 ```
 
 #### CNN Model #1
-The first model consists of four convolutional layer and two dense layers with relu activation functions. Most layers have dropout rates to reduce overfitting as we have limited training dataset and the trainig will have to be conducted using multiple epochs. The following visualizations shows the overall CNN architecture:
+The first model consists of four convolutional layers and two dense layers with relu activation functions. Most layers have dropout rates to reduce overfitting as we have a limited training dataset and the training will have to be conducted using multiple epochs. The following visualizations shows the overall CNN architecture:
 
 ![image post](/assets/images/time_signal_CNN/CNN architecture 4096.png)
 
-and here is the equivalent python code for TensorFlow estimators:
+and here is the equivalent python code for TensorFlow Estimators:
 ```python
 #%% Building the CNN Classifier
 def cnn_model_fn(features, labels, mode):
@@ -219,7 +221,7 @@ def cnn_model_fn(features, labels, mode):
   logits = tf.layers.dense(inputs=dropout4, units=1)
 ```
 
-Since this is a binary classification problem, we use sigmoid function to get the prediction probabilities from logits and use a simple rounding function to assign classes based on the calculated probabilities. Similarly, we use sigmoid cross entropy loss function to navigate the gradients during training optimization:
+Since this is a binary classification problem, we use a sigmoid function to get the prediction probabilities from logits and use a simple rounding function to assign classes based on the calculated probabilities. Similarly, we use a sigmoid cross entropy loss function to navigate the gradients during training optimization:
 ```python
   predictions = {
       # Generate predictions (for PREDICT and EVAL mode)
@@ -258,7 +260,7 @@ Since this is a binary classification problem, we use sigmoid function to get th
 
 #### Training and Evaluation
 
-Since we are dealing with highly imbalanced classes, the standard accuracy metrics for evaluation would be very unreliable. Therefore, custom evaluation using confusion matrix and Mathews Correlation Coefficient (MCC) is calculated based on the predicted probabilities. 
+Since we are dealing with highly imbalanced classes, the standard accuracy metrics for evaluation would be very unreliable. Therefore, custom evaluation using a confusion matrix and Mathews Correlation Coefficient (MCC) is calculated based on the predicted probabilities. 
 
 Mathews Correlation matrix:
 
@@ -271,7 +273,7 @@ def score_model_measurement(probs,threshold):
     return predicted
 ```
 
-once classes are assigned, the corresponding confusion matrix and MCC is calculated:
+Once classes are assigned, the corresponding confusion matrix and MCC is calculated:
 ```python
 #Print confusion matric and calculate Matthews correlation coefficient (MCC) 
 def print_metrics(labels, scores):
@@ -292,13 +294,13 @@ def print_metrics(labels, scores):
     return MCC
 ```
 
-The evaluation routine runs every single epoch and plots the following as function of epoch number:
+The evaluation routine runs every single epoch and plots the following as a function of the epoch number:
 
 - Training set loss (Sigmoid cross entropy)
 - Evaluation set accuracy determined by Area Under Curve (AUC)
 - Evaluation set MCC
 
-Following the development of these parameters during the training allows us to determine the predictive power for minority class, when further learning does not provide further improvement and when we start risking overfitting. 
+Following the development of these parameters during the training allows us to determine the predictive power for the minority class, when further learning does not provide further improvement and when we start risking overfitting. 
 ![image post](/assets/images/time_signal_CNN/Learning_plot_4096.png)
 
 
@@ -326,9 +328,9 @@ Following the development of these parameters during the training allows us to d
 
 #### Conclusion
 
-Both architectures that mostly differed in the number of features and nodes showed similar prediction power achieving accuracy(AUC) of ~0.94 and Mathews Correlation Coefficient around 0.57. For comparison, this is very similar to what we were able to achieve with gradient boosted trees on data from statistical analysis of the time signal. Nevertheless, the construction of the CNN solution was considerably less effort intensive as the CNN automatically extracts the features at a cost of longer training time. If we consider that human capital is more expensive than computing power, this metrics still comes in favour of the CNN.That being said, the ultimate goal is to use ensemble of classifiers that will take a vote on the final class and further increase the predictive power.
+Both architectures, which mostly differed in the number of features and nodes, showed similar prediction power achieving an accuracy(AUC) of ~0.94 and Mathews Correlation Coefficient around 0.57. For comparison, this is very similar to what we were able to achieve with gradient boosted trees on data from statistical analysis of the time signal. Nevertheless, the construction of the CNN solution was considerably less effort intensive as the CNN automatically extracts the features at a cost of longer training time. If we consider that human capital is more expensive than computing power, this metrics still comes in favour of the CNN.That being said, the ultimate goal is to use an ensemble of classifiers that will take a vote on the final class and further increase the predictive power.
 
-The main difference between the two architectures was in the training time where the model #1 required 255 seconds per 100 steps and model #2 required 150 seconds. Therefore, all other metrics being the same, the model #2 would be more favorable as it is faster and requires less computing resources.
+The main difference between the two architectures was in the training time where the model #1 required 255 seconds per 100 steps and model #2 required 150 seconds. Therefore, all other metrics being the same, model #2 would be more favorable as it is faster and requires less computing resources.
 
 Looking at the evaluation plots vs training epoch, we can also estimate that there is very little to no improvement in running the training beyond epoch #40 and we only increase the risk of overfitting.
 
