@@ -12,9 +12,9 @@ author: DATAmadness
 mathjax: true
 ---
 
-When I stumble on an interesting new dataset, I often find myself excitedly prototyping a quick machine learning models to see what type of insights I could get out of the latest find. Since hacking together a quick model can be fast thanks to plenty awesome packages such as scikit-learn or Keras, I happen to spend most of my prototyping effort on cleaning and transforming the data. (I always like to start with the simplest regressors / classifiers)
+When I stumble on an interesting new dataset, I often find myself excitedly prototyping a quick machine learning models to see what type of insights I could get out of the latest find. Since hacking together a quick model can be fast thanks to plenty of awesome packages such as scikit-learn or Keras, I happen to spend most of my prototyping effort on cleaning and transforming the data. (I always like to start with the simplest regressors / classifiers)
 
-To help speeding up the initial transformation pipe, I wrote a small general python function that takes a Pandas DataFrame and automatically transforms any columns that exceed specified skewness. You can get it from [my GitHub repo](https://github.com/datamadness/Automatic-skewness-transformation-for-Pandas-DataFrame). Specifically, you'll find these two python files:
+To help speeding up the initial transformation pipe, I wrote a small general python function that takes a Pandas DataFrame and automatically transforms any column that exceed specified skewness. You can get it from [my GitHub repo](https://github.com/datamadness/Automatic-skewness-transformation-for-Pandas-DataFrame). Specifically, you'll find these two python files:
 
 `skew_autotransform.py`<br>
 `TEST_skew_autotransform.py`
@@ -27,22 +27,22 @@ skew_autotransform(DF, include = None, exclude = None, plot = False, threshold =
 
 #### Feature Overview
 
-* Analyzes all columns in Pandas DataFrame and transforms the data to improve skewness if the original skewness exceeds specified threshold
-* Allows to specify list of columns that should be processed or excluded
-* Selection between Box-Cox transformation or log / exponential transformation
-* Recognizes positive / negative skewness and applies appropriate transform (log / exp)
+* Analyzes all columns in Pandas DataFrame and transforms the data to improve skewness if the original skewness exceeds a specified threshold
+* Allows you to specify which list of columns that should be processed or excluded
+* Select between Box-Cox transformation or log / exponential transformation
+* Recognizes positive / negative skewness and applies the appropriate transform (log / exp)
 * Handles negative values
-* Plots before and after comparison of the data
+* Plots a "before and after" comparison of the data
 
 #### Input parameters summary
 * **DF**: Pandas DataFrame, *mandatory*
 * **threshold**: skewness threshold, default value = 1, *optional*
 * **include**: list of columns to process, *optional*
 * **exclude**: list of columns to exclude, *optional*
-* **exp**: If true, applies log / exponential transformation, default value is False that applies Box-Cox transformation, *optional*
+* **exp**: If true, applies log / exponential transformation, the default value is False that applies Box-Cox transformation, *optional*
 
 #### Example #1
-Import Boston housing dataset and apply Box-Cox transformation on any column that has absolute value of skewness larger than 0.5:
+Import the Boston housing dataset and apply Box-Cox transformation on any column that has an absolute value of skewness larger than 0.5:
 
 ```python
 import pandas as pd
@@ -129,7 +129,7 @@ Average skewness after transformation is 0.74
 </code></pre>
 
 #### Example #2
-Import Boston housing dataset and apply log and exponential transformation on any column that has absolute value of skewness larger than 0.7. Exclude 'B' and 'LSTAT' column from the operation:
+Import the Boston housing dataset and apply log and exponential transformation on any column that has an absolute value of skewness larger than 0.7. Exclude 'B' and 'LSTAT' column from the operation:
 
 ```python
 import pandas as pd
@@ -216,8 +216,8 @@ Average skewness after transformation is 0.92
 </code></pre>
 
 
-The examples demonstrate that both cases allowed me to improve the skewness of the data from 1.5 to more reasonable 0.7 and 0.9 respective using only two lines of code. While the function is not perfect, it is generally good enough for a first prototype. 
+The examples demonstrate that both cases allowed me to improve the skewness of the data from 1.5 to a more reasonable 0.7 and 0.9 respectively using only two lines of code. While the function is not perfect, it is generally good enough for an initial prototype. 
 
-Note: I would recommend to quickly check which transformation works better for your specific dataset. The Box-Cox works well in most situations, but log/exponential can return better results in some cases.
+Note: I would recommend quickly checking which transformation works better for your specific dataset. The Box-Cox works well in most situations, but a log/exponential can return better results in some cases.
 
 Enjoy!

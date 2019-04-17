@@ -12,8 +12,8 @@ author: DATAmadness
 mathjax: true
 ---
 
-TensorFlow Estimators API is great for quickly building your custom models, but you might have noticed there is no  obvious way to pass custom parameters into the input_fn from your estimator. That can be a limiting factor when building more complicated input functions that include a data pipline in them([see this post](https://datamadness.github.io/tensorflow_estimator_large_dataset_feed)).
-This short post shows a quick tip how to use the pythonic lambda function to solve the problem on a single line of code.
+The TensorFlow Estimators API is great for quickly building your custom models, but you might have noticed there is no  obvious way to pass custom parameters from your estimator into the input_fn. That can be a limiting factor when building more complicated input functions that include a data pipeline in them([see this post](https://datamadness.github.io/tensorflow_estimator_large_dataset_feed)).
+This short post offers a quick tip on how to use the pythonic lambda function to solve the problem in a single line of code.
 
 You can get the full python example from [my GitHub repo](https://github.com/datamadness/Feeding-TensorFlow-from-drive-MNIST-Example) for more details and practical demo. Specifically, you want to look into the input function in this file:
 

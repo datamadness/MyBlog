@@ -12,7 +12,7 @@ author: DATAmadness
 mathjax: true
 ---
 
-It is easy to hit resource limits when working with large datasets. In particular, the available memory becomes quickly a limiting factor when training your neural networks on swaths of data. The solution is to create a continuous stream of data that will sequentially read batch data from drive(s). Using this approach, the memory needs to hold only one batch of data while pre-loading the data for the next batch, allowing us to operate with datasets of virtually unlimited size.
+It is easy to hit resource limits when working with large datasets. The available memory in particular becomes quickly a limiting factor when training your neural networks on swaths of data. The solution is to create a continuous stream of data that will sequentially read batch data from drive(s). Using this approach, the memory needs to hold only one batch of data while pre-loading the data for the next batch, allowing us to operate with datasets of virtually unlimited size.
 
 This article demonstrates the approach on the popular [MNIST dataset](http://yann.lecun.com/exdb/mnist/) using TensorFlow Estimators API, TFRecords and Data API.
 
@@ -25,20 +25,20 @@ You can get the full python example from [my GitHub repo](https://github.com/dat
 1. Load MNIST dataset via Keras
 1. Serialize the data into list(s)
 1. Save the data on drive in TFRecord format
-1. Create Estimator API input function that builds dataset from TFRecords using an iterator
-1. Train Convolutional Neural Network streaming the data via a custom input function
+1. Create the Estimator API input function that builds dataset from TFRecords using an iterator
+1. Train the Convolutional Neural Network streaming the data via a custom input function
 
 
 #### Saving Data in TFRecord format
 The MNIST training dataset consists of 60000 28x28 images of hand written digits such as this one:
 ![image post](/assets/images/tf_file_feed/MNIST_digit.png)
 
-To save this data into TFRecord format, couple of things needs to happen: 
+To save this data into TFRecord format, a couple of things need to happen: 
 
-- The data must be represented in dictionary format
-- Individual dictionary values should be flattened into scalars or 1D arrays suitable for storing as series
+- The data must be represented in a dictionary format
+- Individual dictionary values should be flattened into scalars or 1D arrays suitable for storing as a series
 
-The following function tranforms a single 28x28 MNIST digit into the desired format. Notice that the dictionary can have an arbitrary number of keys which is useful for storing any metadata such as original data dimension or training labels:
+The following function transforms a single 28x28 MNIST digit into the desired format. Notice that the dictionary can have an arbitrary number of keys which is useful for storing any metadata such as original data dimension or training labels:
 ```python
 def get_observation(observation_id=0):
     img_data = train_data[observation_id,:,:]
@@ -59,7 +59,7 @@ The next step in generating the TFRecords is to transform the dictionary into an
 - FloatList
 - ByteList
 
-Each datatype can offer different advantages, so it is worth experimenting with them. For example, I was able to significantly reduce the size required for storing the files by encoding Floats/Integers into ByteList, but it increases complexity of your code and it benefits only certain data structures.
+Each datatype can offer different advantages, so it is worth experimenting with them. For example, I was able to significantly reduce the size required for storing the files by encoding Floats/Integers into ByteList, but it increases the complexity of your code and it benefits only certain data structures.
 
 ```python 
 def get_example_object(single_record):
@@ -78,7 +78,7 @@ def get_example_object(single_record):
     return record
 ```
 
-Using the transformation functions above, we can finally write the MNIST trainig dataset into TFRecord files. The following piece of code save the dataset into 10 files with 6000 records per file:
+Using the transformation functions above, we can finally write the MNIST training dataset into TFRecord files. The following piece of code save the dataset into 10 files with 6000 records per file:
 
 ```python
 #Number of TFR files to save the data into
@@ -98,10 +98,12 @@ for file_id in range(numFiles):
 ```
 
 
-#### Builing an input function for Estimators API usign TensorFlow Data API
-Once we have the data saved into TFRecords on a drive, the next step is to write an input fucntion for the Estimators API that will stream the data into your model. 
-The easiest way to accomplish this is via the Data API, specifically the TFRecordDataset class that will directly create a dataset from list of TFRecord files. The Estimators and Data APIs are designed to work together, so you do not even have to initialize the iterator for your dataset.
-The only trick to this is that you have to write a parser that will transform the serialized data in lists back into format suitable for your model. As such this is also a perfect place to build your pipeline for further data preprocessing, transformation and feature engineering.
+#### Building an input function for Estimators API using TensorFlow Data API
+Once we have the data saved into TFRecords on a drive, the next step is to write an input function for the Estimators API that will stream the data into your model. 
+The easiest way to accomplish this is via the Data API, specifically the TFRecordDataset class that will directly create a dataset from a list of TFRecord files. 
+
+The Estimators and Data APIs are designed to work together, so you do not even have to initialize the iterator for your dataset.
+The only trick to is that you have to write a parser that will transform the serialized data in lists back into a format suitable for your model. As such this is also the perfect place to build your pipeline for further data preprocessing, transformation, and feature engineering.
 
 Here is the input function for our MNIST dataset:
 
@@ -146,7 +148,7 @@ def dataset_input_fn(subfolder, batch_size, train = False, num_epochs=None):
 
 #### Plugging it all together: Training your CNN on a data stream from TFR files
 
-Now when we have all the bits ready, we can put it all together and train our MNIST CNN on a data streaming from TFRecord files saved on your drive. Here is the complete modified [MNIST CNN example from TensorFlow page](https://www.tensorflow.org/tutorials/estimators/cnn):
+Now when we have all the pieces ready, we can put it all together and train our MNIST CNN on a data streaming from TFRecord files saved on your drive. Here is the complete modified [MNIST CNN example from TensorFlow page](https://www.tensorflow.org/tutorials/estimators/cnn):
 
 ```python
 import tensorflow as tf
