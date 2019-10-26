@@ -1,0 +1,18 @@
+1. Make changes in "MyBlog"
+2. Right-click on "MyBlog" and select git bash
+3. Run "bundle exec jekyll build"
+4. Commit datamadness.github.io to master and push to origin
+5. Optional: Commit and push"MyBlog" or you risk loosing local files
+
+Prerequisites:
+a) Install gitbash (https://gitforwindows.org)
+b) Since Jekyll requires ruby, install the win installer with the development kit: https://rubyinstaller.org/downloads/ and select option 3 during installation
+c) Install cygwin https://cygwin.com/install.html During installation, select all the packages (g++, gcc, make). Cygwin will be typically installed to C:\cygwin64. Once installed, add C:\cygwin64\bin to path
+d) Open new cmd and run "gem install jekyll bundler" command
+e) Run"jekyll -v" in cmd to check if jekyll was installed
+
+
+Alternative:
+Install jekyll (https://jekyllrb.com/docs/installation/)
+
+
