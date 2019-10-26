@@ -10,6 +10,7 @@ b) Since Jekyll requires ruby, install the win installer with the development ki
 c) Install cygwin https://cygwin.com/install.html During installation, select all the packages (g++, gcc, make). Cygwin will be typically installed to C:\cygwin64. Once installed, add C:\cygwin64\bin to path
 d) Open new cmd and run "gem install jekyll bundler" command
 e) Run"jekyll -v" in cmd to check if jekyll was installed
+f) Run "bundle install" in cmd (should show bunch of things installed)
 
 
 Alternative:
