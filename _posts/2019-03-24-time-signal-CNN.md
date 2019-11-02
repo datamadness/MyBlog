@@ -1,4 +1,3 @@
-drive
 ---
 layout: post
 current: post
