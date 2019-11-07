@@ -12,7 +12,7 @@ author: DATAmadness
 mathjax: true
 ---
 
-TensorFlow 2 has finally became available this fall and as expected, it offers support for both standard CPU as well as GPU based deep learning. Since using GPU for deep learning task has became particularly popular topic after the release of NVIDIA's Turing architecture, I was interested to have a closer look how the CPU training speed compares to GPU using the latest TF2 package.
+TensorFlow 2 has finally became available this fall and as expected, it offers support for both standard CPU as well as GPU based deep learning. Since using GPU for deep learning task has became particularly popular topic after the release of NVIDIA's Turing architecture, I was interested to get a closer look at how the CPU training speed compares to GPU while using the latest TF2 package.
 
 In this test, I am using a local machine with:
 * 8 core Ryzen 2700x CPU (16 threads, 20MB cache, 4.3GHz max boost)
