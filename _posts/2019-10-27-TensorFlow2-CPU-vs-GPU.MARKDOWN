@@ -12,7 +12,7 @@ author: DATAmadness
 mathjax: true
 ---
 
-TensorFlow 2 has finally became available this fall and as expected, it offers support for standard CPU as well as GPU based deep learning. Since GPU based deep learning has became particularly popular topic after the release of NVIDIA's RTX series, I was interested to have a closer look how the CPU training speed compares to GPU using the latest TF2 package.
+TensorFlow 2 has finally became available this fall and as expected, it offers support for both standard CPU as well as GPU based deep learning. Since using GPU for deep learning task has became particularly popular topic after the release of NVIDIA's Turing architecture, I was interested to have a closer look how the CPU training speed compares to GPU using the latest TF2 package.
 
 In this test, I am using a local machine with:
 * 8 core Ryzen 2700x CPU (16 threads, 20MB cache, 4.3GHz max boost)
@@ -20,7 +20,7 @@ In this test, I am using a local machine with:
 * 32GB 3200MHZ DDR4 RAM
 * Win 10
 
-The test will compare the speed of a fairly standard task of training a Convolutional Neural Network using tensorflow==2.0.0-rc1 and tensorflow-gpu==2.0.0-rc1. The neural network has a ~58 million parameters and I will benchmark the performance by running it for 10 epochs on a dataset with ~10k 256x256 images loaded via generator with image augmentation. The whole model is built using Keras, which offers considerably improved integration in TensorFLow 2. 
+The test will compare the speed of a fairly standard task of training a Convolutional Neural Network using tensorflow==2.0.0-rc1 and tensorflow-gpu==2.0.0-rc1. The neural network has ~58 million parameters and I will benchmark the performance by running it for 10 epochs on a dataset with ~10k 256x256 images loaded via generator with image augmentation. The whole model is built using Keras, which offers considerably improved integration in TensorFLow 2. 
 
 ### CNN Model Used for the Benchmark
 
@@ -78,7 +78,7 @@ _________________________________________________________________
 
 ### Creating the Virtual Environments
 
-To make the test fair, I created two new virtual environments for each version of TensorFlow 2. 
+To make the test ubiased by a whole lot dependencies in a cluttered environment, I created two new virtual environments for each version of TensorFlow 2. 
 
 **Standard CPU based TensorFlow 2**
 ```python
@@ -98,7 +98,7 @@ Note that you need to install CUDA devkit to allow proper TF2 functionality. You
 [https://www.tensorflow.org/install/gpu#windows_setup](https://www.tensorflow.org/install/gpu#windows_setup "https://www.tensorflow.org/install/gpu#windows_setup")
 
 ### Training the CNN on CPU
-Using the CPU only, each Epoch took ~480 seconds with 3s/step. The resource monitor showed 80% CPU utilization while GPU utilization hovered around 1-2% with only 0.5 out of 8GB memory being used:
+Using the CPU only, each Epoch took ~480 seconds or 3s per step. The resource monitor showed 80% CPU utilization while GPU utilization hovered around 1-2% with only 0.5 out of 8GB memory being used:
 
 <img src="/assets/images/GPUvsCPU/CPU TF2_CPU_env.png" width="800"/>
 <img src="/assets/images/GPUvsCPU/GPU TF2_CPU_env.png" width="800"/>
@@ -130,7 +130,7 @@ Epoch 10/10
 
 ### Training the CNN on GPU
 
-Using the GPU, it was immediately obvious that the training is much faster. Each Epoch took ~75 seconds with 0.5s/step. The resource monitor showed CPU utilization below 60% while GPU utilization hovered around 11% with the 8GB memory being fully used:
+In contrast, after enabling the GPU version, it was immediately obvious that the training is considerably faster. Each Epoch took ~75 seconds or about 0.5s per step. That is results in 85% less training time. While using the GPU, the resource monitor showed CPU utilization below 60% while GPU utilization hovered around 11% with the 8GB memory being fully used:
 
 <img src="/assets/images/GPUvsCPU/CPU TF2_GPU_env.png" width="800"/>
 <img src="/assets/images/GPUvsCPU/GPU TF2_GPU_env.png" width="800"/>
@@ -162,7 +162,8 @@ Epoch 10/10
 
 ### The Conclusion
 
-While setting up the GPU is slightly more complex, the performance gain is well worth it. In this specific case, the 2080 rtx GPU CNN trainig was more than 6x faster than using the Ryzen 2700x CPU only. This becomes far more pronounced in a real life training scenarios where you can easily spend multiple days training a model. In this case, the GPU can allow you to train one model overnight while the CPU would be crunching the data for most of your week.
+While setting up the GPU is slightly more complex, the performance gain is well worth it. In this specific case, the 2080 rtx GPU CNN trainig was more than 6x faster than using the Ryzen 2700x CPU only. In other words, using the GPU reduced the required training time by 85%. This becomes far more pronounced in a real life training scenarios where you can easily spend multiple days training a single model. In this case, the GPU can allow you to train one model overnight while the CPU would be crunching the data for most of your week.<br>
+Moreover, it seems that the main limiting factor for the GPU training was the available memory. It seems fair to assume that by tweaking the code and/or using GPU with more memory would further improve the performance. It seems that GPU training needs to become the default option in my toolkit.
 
 **Comparison summary**
 
